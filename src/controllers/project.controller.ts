@@ -4,7 +4,7 @@ import projectRepository from '../repositories/project.repository';
 function getAll(req: Request, res: Response) {
 	try {
 		const result = projectRepository.getAll();
-		res.json({ status: 'success', data: result });
+		res.json({ status: 'Success', data: result });
 	} catch (err) {
 		errorResponse(res);
 	}
@@ -13,7 +13,7 @@ function getAll(req: Request, res: Response) {
 function create(req: Request, res: Response) {
 	try {
 		projectRepository.create(req.body.name, req.body.description);
-		res.json({ status: 'success', message: 'Insert successfully!' });
+		res.json({ status: 'Success', message: 'Inserted Successfully!' });
 	} catch (err) {
 		errorResponse(res);
 	}
@@ -23,10 +23,10 @@ function findById(req: Request, res: Response) {
 	try {
 		const result = projectRepository.findById(req.params.id);
 		if (result === null) {
-			res.status(404).json({ status: 'not_fount' });
+			res.status(404).json({ status: 'Not Found' });
 			return;
 		}
-		res.json({ status: 'success', data: result });
+		res.json({ status: 'Success', data: result });
 	} catch (err) {
 		errorResponse(res);
 	}
@@ -35,7 +35,7 @@ function findById(req: Request, res: Response) {
 function remove(req: Request, res: Response) {
 	try {
 		projectRepository.remove(req.params.id);
-		res.json({ status: 'success', message: 'Delete successfully!' });
+		res.json({ status: 'Success', message: 'Deleted Successfully!' });
 	} catch (err) {
 		errorResponse(res);
 	}
@@ -48,7 +48,7 @@ function update(req: Request, res: Response) {
 			req.body.description,
 			req.params.id,
 		);
-		res.json({ status: 'success', message: 'Updated successfully!' });
+		res.json({ status: 'Success', message: 'Updated Successfully!' });
 	} catch (err) {
 		errorResponse(res);
 	}
@@ -57,7 +57,7 @@ function update(req: Request, res: Response) {
 function errorResponse(res: Response) {
 	res.status(500).json({
 		status: 'error',
-		message: 'Something went wrong!',
+		message: 'Oops! Something went wrong',
 	});
 }
 

@@ -4,7 +4,7 @@ import reportRepository from '../repositories/report.repository';
 function getAll(req: Request, res: Response) {
 	try {
 		const result = reportRepository.getAll();
-		res.json({ status: 'success', data: result });
+		res.json({ status: 'Success', data: result });
 	} catch (err) {
 		errorResponse(res);
 	}
@@ -13,7 +13,7 @@ function getAll(req: Request, res: Response) {
 function create(req: Request, res: Response) {
 	try {
 		reportRepository.create(req.body.text, req.body.project_id);
-		res.json({ status: 'success', message: 'Insert successfully!' });
+		res.json({ status: 'Success', message: 'Inserted Successfully!' });
 	} catch (err) {
 		errorResponse(res);
 	}
@@ -23,10 +23,10 @@ function findById(req: Request, res: Response) {
 	try {
 		const result = reportRepository.findById(req.params.id);
 		if (result === null) {
-			res.status(404).json({ status: 'not_fount' });
+			res.status(404).json({ status: 'Not Foundt' });
 			return;
 		}
-		res.json({ status: 'success', data: result });
+		res.json({ status: 'Success', data: result });
 	} catch (err) {
 		errorResponse(res);
 	}
@@ -35,7 +35,7 @@ function findById(req: Request, res: Response) {
 function findByProjectId(req: Request, res: Response) {
 	try {
 		const result = reportRepository.findByProjectId(req.params.projectId);
-		res.json({ status: 'success', data: result });
+		res.json({ status: 'Success', data: result });
 	} catch (err) {
 		errorResponse(res);
 	}
@@ -44,7 +44,7 @@ function findByProjectId(req: Request, res: Response) {
 function remove(req: Request, res: Response) {
 	try {
 		reportRepository.remove(req.params.id);
-		res.json({ status: 'success', message: 'Delete successfully!' });
+		res.json({ status: 'Success', message: 'Deleted Successfully!' });
 	} catch (err) {
 		errorResponse(res);
 	}
@@ -57,7 +57,7 @@ function update(req: Request, res: Response) {
 			req.body.text,
 			req.params.id,
 		);
-		res.json({ status: 'success', message: 'Updated successfully!' });
+		res.json({ status: 'Success', message: 'Updated successfully!' });
 	} catch (err) {
 		errorResponse(res);
 	}
