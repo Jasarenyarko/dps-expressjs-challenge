@@ -2,15 +2,16 @@ import db from '../services/db.service';
 import { v4 as uuidv4 } from 'uuid';
 import ProjectInterface from '../lib/project.lib';
 
-function getAll() {
+function getAll(): ProjectInterface[] {
 	try {
 		return db.query('SELECT * FROM projects') as ProjectInterface[];
 	} catch (error) {
 		handleDatabaseError(error);
+		return [];
 	}
 }
 
-function create(name: string, description: string) {
+function create(name: string, description: string): void {
 	const id = uuidv4();
 	try {
 		db.run(
@@ -22,7 +23,7 @@ function create(name: string, description: string) {
 	}
 }
 
-function findById(id: string) {
+function findById(id: string): ProjectInterface | null {
 	try {
 		const result = db.query('SELECT * FROM projects WHERE id=@id', { id });
 		if (result.length === 0) {
@@ -31,10 +32,11 @@ function findById(id: string) {
 		return result[0] as ProjectInterface;
 	} catch (error) {
 		handleDatabaseError(error);
+		return null;
 	}
 }
 
-function remove(id: string) {
+function remove(id: string): void {
 	try {
 		db.run('DELETE FROM projects WHERE id=@id', { id });
 	} catch (error) {
@@ -42,7 +44,7 @@ function remove(id: string) {
 	}
 }
 
-function update(name: string, description: string, id: string) {
+function update(name: string, description: string, id: string): void {
 	try {
 		db.run(
 			'UPDATE projects SET name=@name, description=@description WHERE id=@id',
@@ -53,7 +55,10 @@ function update(name: string, description: string, id: string) {
 	}
 }
 
-function handleDatabaseError(error: unknown, uniqueConstraintMessage?: string) {
+function handleDatabaseError(
+	error: unknown,
+	uniqueConstraintMessage?: string,
+): void {
 	if (error instanceof Error) {
 		if (
 			uniqueConstraintMessage &&
