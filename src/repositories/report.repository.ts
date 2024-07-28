@@ -5,49 +5,83 @@ import ReportInterface from '../lib/report.lib';
 const SPECIAL_REPORT_THRESHOLD = 3;
 
 function getAll() {
-	return db.query(
-		'SELECT *, (SELECT name FROM projects WHERE id=reports.projectid) AS project_name FROM reports',
-	) as ReportInterface[];
+	try {
+		return db.query(
+			'SELECT *, (SELECT name FROM projects WHERE id=reports.projectid) AS project_name FROM reports',
+		) as ReportInterface[];
+	} catch (error) {
+		handleDatabaseError(error);
+		return [];
+	}
 }
 
 function create(text: string, projectId: string) {
 	const id = uuidv4();
-	db.run(
-		'INSERT INTO reports (id, text, projectid) VALUES(@id, @text, @projectId)',
-		{ id, text, projectId },
-	);
+	try {
+		db.run(
+			'INSERT INTO reports (id, text, projectid) VALUES(@id, @text, @projectId)',
+			{ id, text, projectId },
+		);
+	} catch (error) {
+		handleDatabaseError(error);
+	}
 }
 
 function findById(id: string) {
-	const result = db.query('SELECT * FROM reports WHERE id=@id', { id });
-	if (result.length === 0) {
+	try {
+		const result = db.query('SELECT * FROM reports WHERE id=@id', { id });
+		if (result.length === 0) {
+			return null;
+		}
+		return result[0] as ReportInterface;
+	} catch (error) {
+		handleDatabaseError(error);
 		return null;
 	}
-
-	return result[0] as ReportInterface;
 }
 
 function findByProjectId(projectId: string) {
-	return db.query('SELECT * FROM reports WHERE projectid=@projectId', {
-		projectId,
-	}) as ReportInterface[];
+	try {
+		return db.query('SELECT * FROM reports WHERE projectid=@projectId', {
+			projectId,
+		}) as ReportInterface[];
+	} catch (error) {
+		handleDatabaseError(error);
+		return [];
+	}
 }
 
 function remove(id: string) {
-	db.run('DELETE FROM reports WHERE id=@id', { id });
+	try {
+		db.run('DELETE FROM reports WHERE id=@id', { id });
+	} catch (error) {
+		handleDatabaseError(error);
+	}
 }
 
 function update(projectId: string, text: string, id: string) {
-	db.run('UPDATE REPORTS SET text=@text, projectid=@projectId WHERE id=@id', {
-		projectId,
-		text,
-		id,
-	});
+	try {
+		db.run(
+			'UPDATE reports SET text=@text, projectid=@projectId WHERE id=@id',
+			{
+				projectId,
+				text,
+				id,
+			},
+		);
+	} catch (error) {
+		handleDatabaseError(error);
+	}
 }
 
 function specialReport() {
-	const data = db.query('SELECT text FROM reports') as ReportInterface[];
-	return data.filter(hasFrequentWords);
+	try {
+		const data = db.query('SELECT text FROM reports') as ReportInterface[];
+		return data.filter(hasFrequentWords);
+	} catch (error) {
+		handleDatabaseError(error);
+		return [];
+	}
 }
 
 function hasFrequentWords(item: ReportInterface) {
@@ -66,6 +100,14 @@ function hasFrequentWords(item: ReportInterface) {
 		count[word] = 1;
 	}
 	return false;
+}
+
+function handleDatabaseError(error: unknown) {
+	if (error instanceof Error) {
+		console.error(`Database error: ${error.message}`);
+	} else {
+		console.error('Unknown database error');
+	}
 }
 
 export default {
