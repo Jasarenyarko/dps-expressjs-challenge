@@ -23,7 +23,7 @@ function findById(req: Request, res: Response) {
 	try {
 		const result = reportRepository.findById(req.params.id);
 		if (result === null) {
-			res.status(404).json({ status: 'Not Foundt' });
+			res.status(404).json({ status: 'Not Found' });
 			return;
 		}
 		res.json({ status: 'Success', data: result });
