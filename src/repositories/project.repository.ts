@@ -3,35 +3,68 @@ import { v4 as uuidv4 } from 'uuid';
 import ProjectInterface from '../lib/project.lib';
 
 function getAll() {
-	return db.query('SELECT * FROM projects') as ProjectInterface[];
+	try {
+		return db.query('SELECT * FROM projects') as ProjectInterface[];
+	} catch (error) {
+		handleDatabaseError(error);
+	}
 }
 
 function create(name: string, description: string) {
 	const id = uuidv4();
-	db.run(
-		'INSERT INTO projects (id, name, description) VALUES (@id, @name, @description)',
-		{ id, name, description },
-	);
+	try {
+		db.run(
+			'INSERT INTO projects (id, name, description) VALUES (@id, @name, @description)',
+			{ id, name, description },
+		);
+	} catch (error) {
+		handleDatabaseError(error, 'UNIQUE constraint failed: projects.id');
+	}
 }
 
 function findById(id: string) {
-	const result = db.query('SELECT * FROM projects WHERE id=@id', { id });
-	if (result.length === 0) {
-		return null;
+	try {
+		const result = db.query('SELECT * FROM projects WHERE id=@id', { id });
+		if (result.length === 0) {
+			return null;
+		}
+		return result[0] as ProjectInterface;
+	} catch (error) {
+		handleDatabaseError(error);
 	}
-
-	return result[0] as ProjectInterface;
 }
 
 function remove(id: string) {
-	db.run('DELETE FROM projects WHERE id=@id', { id });
+	try {
+		db.run('DELETE FROM projects WHERE id=@id', { id });
+	} catch (error) {
+		handleDatabaseError(error);
+	}
 }
 
 function update(name: string, description: string, id: string) {
-	db.run(
-		'UPDATE projects SET name=@name, description=@description WHERE id=@id',
-		{ name, description, id },
-	);
+	try {
+		db.run(
+			'UPDATE projects SET name=@name, description=@description WHERE id=@id',
+			{ name, description, id },
+		);
+	} catch (error) {
+		handleDatabaseError(error);
+	}
+}
+
+function handleDatabaseError(error: unknown, uniqueConstraintMessage?: string) {
+	if (error instanceof Error) {
+		if (
+			uniqueConstraintMessage &&
+			error.message.includes(uniqueConstraintMessage)
+		) {
+			throw new Error(uniqueConstraintMessage);
+		}
+		throw new Error(`Database error: ${error.message}`);
+	} else {
+		throw new Error('Unknown database error');
+	}
 }
 
 export default { getAll, create, findById, remove, update };
